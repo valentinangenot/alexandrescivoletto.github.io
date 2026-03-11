@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Alexandre Scivoletto — PhD Finance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Outfit:wght@200;300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fafaf8;
+      --bg2: #f3f2ee;
+      --ink: #1a1a1a;
+      --ink2: #404040;
+      --muted: #8a8a8a;
+      --accent: #2d5a3d;
+      --accent2: #3a7350;
+      --accent-bg: rgba(45,90,61,0.05);
+      --accent-bd: rgba(45,90,61,0.15);
+      --line: rgba(0,0,0,0.08);
+      --white: #ffffff;
+      --radius: 3px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+    html { font-size: 16px; scroll-behavior: smooth }
+    body { background: var(--bg); color: var(--ink); font-family: 'Outfit', sans-serif; font-weight: 300; overflow-x: hidden; -webkit-font-smoothing: antialiased }
+
+    ::selection { background: var(--accent); color: #fff }
+
+    /* ── LOADER ── */
+    .loader { position: fixed; inset: 0; z-index: 9999; background: var(--ink); display: flex; align-items: center; justify-content: center; transition: opacity .6s ease .2s, visibility 0s .8s }
+    .loader.done { opacity: 0; visibility: hidden }
+    .loader-inner { text-align: center }
+    .loader-initials { font-family: 'EB Garamond', serif; font-size: 3rem; font-weight: 400; color: var(--bg); letter-spacing: .15em; opacity: 0; animation: loaderIn .8s ease forwards .1s }
+    .loader-bar { width: 40px; height: 1px; background: var(--accent2); margin: 1rem auto 0; transform: scaleX(0); animation: loaderBar .6s ease forwards .4s }
+    @keyframes loaderIn { to { opacity: 1 } }
+    @keyframes loaderBar { to { transform: scaleX(1) } }
+
+    /* ── NAV ── */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 3.5rem; transition: all .4s ease }
+    nav.scrolled { background: rgba(250,250,248,.92); backdrop-filter: blur(20px); border-bottom: 1px solid var(--line); padding: 1rem 3.5rem }
+    .nav-name { font-family: 'EB Garamond', serif; font-size: 1rem; font-weight: 500; color: var(--ink); text-decoration: none; letter-spacing: .02em }
+    .nav-name:hover { color: var(--accent) }
+    .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center }
+    .nav-links a { font-size: .68rem; font-weight: 400; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color .3s }
+    .nav-links a:hover, .nav-links a.active { color: var(--ink) }
+    .nav-cv { padding: .4rem 1rem; border: 1px solid var(--accent-bd); color: var(--accent) !important; border-radius: var(--radius); font-weight: 500 !important; transition: all .3s }
+    .nav-cv:hover { background: var(--accent-bg); border-color: var(--accent) }
+
+    .hamburger { display: none; cursor: pointer; width: 26px; height: 18px; position: relative; background: none; border: none; z-index: 210 }
+    .hamburger span { display: block; position: absolute; width: 100%; height: 1px; background: var(--ink); transition: all .35s ease }
+    .hamburger span:nth-child(1) { top: 0 }
+    .hamburger span:nth-child(2) { top: 50%; transform: translateY(-50%) }
+    .hamburger span:nth-child(3) { bottom: 0 }
+    .hamburger.open span:nth-child(1) { top: 50%; transform: translateY(-50%) rotate(45deg) }
+    .hamburger.open span:nth-child(2) { opacity: 0 }
+    .hamburger.open span:nth-child(3) { bottom: 50%; transform: translateY(50%) rotate(-45deg) }
+
+    .mobile-overlay { position: fixed; inset: 0; z-index: 199; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .5rem; opacity: 0; pointer-events: none; transition: opacity .4s ease }
+    .mobile-overlay.open { opacity: 1; pointer-events: all }
+    .mobile-overlay a { font-family: 'EB Garamond', serif; font-size: 1.8rem; color: var(--ink); text-decoration: none; padding: .4rem 0; opacity: 0; transform: translateY(15px); transition: opacity .4s ease, transform .4s ease, color .3s }
+    .mobile-overlay.open a { opacity: 1; transform: none }
+    .mobile-overlay.open a:nth-child(1) { transition-delay: .05s }
+    .mobile-overlay.open a:nth-child(2) { transition-delay: .1s }
+    .mobile-overlay.open a:nth-child(3) { transition-delay: .15s }
+    .mobile-overlay.open a:nth-child(4) { transition-delay: .2s }
+    .mobile-overlay.open a:nth-child(5) { transition-delay: .25s }
+    .mobile-overlay.open a:nth-child(6) { transition-delay: .3s }
+    .mobile-overlay a:hover { color: var(--accent) }
+
+    /* ── HERO ── */
+    .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 0 3.5rem; position: relative }
+    .hero-label { font-family: 'JetBrains Mono', monospace; font-size: .6rem; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); margin-bottom: 2rem; opacity: 0; animation: fadeIn .6s ease forwards .8s }
+    .hero h1 { font-family: 'EB Garamond', serif; font-size: clamp(3.2rem, 6.5vw, 6rem); font-weight: 400; line-height: 1.1; letter-spacing: -.02em; color: var(--ink) }
+    .hero h1 .word { display: inline-block; overflow: hidden; vertical-align: bottom }
+    .hero h1 .word-inner { display: inline-block; transform: translateY(105%); animation: wordUp .9s cubic-bezier(.22,1,.36,1) forwards }
+    .hero h1 .word:nth-child(1) .word-inner { animation-delay: .6s }
+    .hero h1 .word:nth-child(2) .word-inner { animation-delay: .72s }
+    @keyframes wordUp { to { transform: translateY(0) } }
+    .hero h1 em { font-style: italic; color: var(--accent2) }
+    .hero-sub { font-size: 1.05rem; font-weight: 300; color: var(--ink2); line-height: 1.7; max-width: 520px; margin-top: 1.8rem; opacity: 0; animation: fadeIn .7s ease forwards 1.1s }
+    .hero-sub strong { font-weight: 500; color: var(--ink) }
+    .hero-links { display: flex; gap: .8rem; margin-top: 2.2rem; opacity: 0; animation: fadeIn .7s ease forwards 1.3s }
+    .hero-btn { display: inline-block; padding: .7rem 1.8rem; font-size: .68rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; border-radius: var(--radius); transition: all .3s ease }
+    .hero-btn.primary { background: var(--ink); color: var(--bg); border: 1px solid var(--ink) }
+    .hero-btn.primary:hover { background: var(--accent2); border-color: var(--accent2) }
+    .hero-btn.secondary { border: 1px solid var(--line); color: var(--ink2); background: transparent }
+    .hero-btn.secondary:hover { border-color: var(--ink); color: var(--ink) }
+
+    .hero-scroll { position: absolute; bottom: 2.5rem; left: 3.5rem; display: flex; align-items: center; gap: .6rem; opacity: 0; animation: fadeIn .6s ease forwards 1.6s }
+    .hero-scroll-line { width: 1px; height: 32px; background: var(--accent-bd); position: relative; overflow: hidden }
+    .hero-scroll-line::after { content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 100%; background: var(--accent); animation: scrollLine 2s ease-in-out infinite }
+    @keyframes scrollLine { 0% { top: -100% } 50% { top: 100% } 100% { top: 100% } }
+    .hero-scroll span { font-family: 'JetBrains Mono', monospace; font-size: .5rem; letter-spacing: .15em; text-transform: uppercase; color: var(--muted) }
+
+    .hero-aside { position: absolute; right: 3.5rem; bottom: 2.5rem; text-align: right; opacity: 0; animation: fadeIn .6s ease forwards 1.5s }
+    .hero-aside span { display: block; font-family: 'JetBrains Mono', monospace; font-size: .52rem; letter-spacing: .12em; color: var(--muted); line-height: 2 }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: none } }
+
+    /* ── SECTION STYLES ── */
+    section { padding: 6rem 3.5rem; position: relative }
+    .sec-header { display: flex; align-items: baseline; gap: 1.2rem; margin-bottom: 3rem }
+    .sec-num { font-family: 'JetBrains Mono', monospace; font-size: .55rem; color: var(--accent); letter-spacing: .1em }
+    .sec-title { font-family: 'EB Garamond', serif; font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 400; color: var(--ink) }
+    .sec-rule { flex: 1; height: 1px; background: var(--line); transform: scaleX(0); transform-origin: left; transition: transform 1s cubic-bezier(.22,1,.36,1) .2s }
+    .sec-header.visible .sec-rule { transform: scaleX(1) }
+
+    /* ── ABOUT ── */
+    #about { background: var(--bg2) }
+    .about-content { max-width: 680px }
+    .about-content p { font-family: 'EB Garamond', serif; font-size: 1.15rem; font-weight: 400; color: var(--ink2); line-height: 2; margin-bottom: 1rem }
+    .about-content p strong { color: var(--ink); font-weight: 600 }
+
+    /* ── EXPERIENCE ── */
+    #experience { background: var(--bg) }
+    .exp-list { display: flex; flex-direction: column }
+    .exp-row { display: grid; grid-template-columns: 140px 1fr; gap: 2rem; padding: 1.8rem 0; border-bottom: 1px solid var(--line); transition: background .3s }
+    .exp-row:first-child { border-top: 1px solid var(--line) }
+    .exp-row:hover { background: var(--accent-bg) }
+    .exp-period { font-family: 'JetBrains Mono', monospace; font-size: .58rem; color: var(--muted); letter-spacing: .04em; padding-top: .2rem; line-height: 1.8 }
+    .exp-role { font-size: .95rem; font-weight: 500; color: var(--ink) }
+    .exp-place { font-family: 'JetBrains Mono', monospace; font-size: .6rem; color: var(--accent); letter-spacing: .06em; margin-top: .15rem }
+    .exp-desc { font-size: .83rem; color: var(--ink2); line-height: 1.7; margin-top: .4rem; max-width: 540px }
+    .exp-tags { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .5rem }
+    .tag { display: inline-block; padding: .18rem .55rem; background: var(--accent-bg); color: var(--accent); font-size: .55rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; border-radius: 2px; border: 1px solid var(--accent-bd) }
+
+    /* ── EDUCATION ── */
+    #education { background: var(--ink); color: var(--bg) }
+    #education .sec-num { color: var(--accent2) }
+    #education .sec-title { color: var(--bg) }
+    #education .sec-rule { background: rgba(255,255,255,.08) }
+    .edu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.2rem }
+    .edu-card { border: 1px solid rgba(255,255,255,.08); border-radius: var(--radius); padding: 1.8rem; position: relative; overflow: hidden; transition: border-color .3s, transform .4s ease }
+    .edu-card:hover { border-color: rgba(58,115,80,.5); transform: translateY(-4px) }
+    .edu-year-bg { position: absolute; right: .8rem; bottom: -.2rem; font-family: 'EB Garamond', serif; font-size: 5rem; font-weight: 700; color: rgba(255,255,255,.03); line-height: 1; pointer-events: none; transition: color .3s }
+    .edu-card:hover .edu-year-bg { color: rgba(58,115,80,.08) }
+    .edu-school { font-family: 'JetBrains Mono', monospace; font-size: .55rem; color: var(--accent2); letter-spacing: .1em; text-transform: uppercase }
+    .edu-degree { font-family: 'EB Garamond', serif; font-size: 1.05rem; font-weight: 400; color: var(--bg); margin-top: .5rem; line-height: 1.45 }
+    .edu-date { font-family: 'JetBrains Mono', monospace; font-size: .52rem; color: rgba(255,255,255,.25); margin-top: .4rem; letter-spacing: .06em }
+
+    /* ── AWARDS ── */
+    #awards { background: var(--bg2) }
+    .awards-list { display: flex; flex-direction: column; gap: 1rem }
+    .award-item { display: flex; gap: 1.5rem; align-items: flex-start; background: var(--white); border: 1px solid var(--line); border-left: 3px solid transparent; border-radius: var(--radius); padding: 1.5rem 1.8rem; transition: all .35s ease }
+    .award-item:hover { border-left-color: var(--accent); transform: translateX(6px); box-shadow: -6px 0 20px rgba(45,90,61,.04) }
+    .award-icon { font-size: 1.5rem; flex-shrink: 0; padding-top: .1rem }
+    .award-title { font-family: 'EB Garamond', serif; font-size: 1.05rem; font-weight: 500; color: var(--ink) }
+    .award-desc { font-size: .8rem; color: var(--ink2); line-height: 1.65; margin-top: .3rem }
+
+    /* ── RESEARCH ── */
+    #research { background: var(--bg) }
+    .research-cards { display: flex; flex-direction: column; gap: 1rem }
+    .research-card { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.8rem; transition: all .35s ease }
+    .research-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,.05); transform: translateY(-3px) }
+    .research-tag { font-family: 'JetBrains Mono', monospace; font-size: .55rem; color: var(--accent); letter-spacing: .1em; text-transform: uppercase }
+    .research-title { font-family: 'EB Garamond', serif; font-size: 1.15rem; font-weight: 500; color: var(--ink); margin-top: .4rem; line-height: 1.4 }
+    .research-meta { font-size: .75rem; color: var(--muted); margin-top: .4rem; line-height: 1.6 }
+
+    /* ── LANGUAGES ── */
+    #languages { background: var(--ink); color: var(--bg) }
+    #languages .sec-num { color: var(--accent2) }
+    #languages .sec-title { color: var(--bg) }
+    #languages .sec-rule { background: rgba(255,255,255,.08) }
+    .lang-row { display: flex; flex-wrap: wrap; gap: 1rem }
+    .lang-item { flex: 1; min-width: 140px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); padding: 1.4rem; text-align: center; transition: all .35s ease }
+    .lang-item:hover { border-color: rgba(58,115,80,.4); transform: translateY(-4px); background: rgba(255,255,255,.05) }
+    .lang-flag { font-size: 1.6rem }
+    .lang-name { font-size: .85rem; font-weight: 500; color: var(--bg); margin-top: .5rem }
+    .lang-level { font-family: 'JetBrains Mono', monospace; font-size: .55rem; color: rgba(255,255,255,.3); margin-top: .2rem; letter-spacing: .05em }
+
+    /* ── CONTACT ── */
+    #contact { background: var(--bg2); text-align: center; padding: 8rem 3.5rem; position: relative; overflow: hidden }
+    .contact-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'EB Garamond', serif; font-size: clamp(6rem, 16vw, 16rem); font-weight: 700; color: rgba(45,90,61,.03); white-space: nowrap; pointer-events: none }
+    .contact-label { font-family: 'JetBrains Mono', monospace; font-size: .58rem; color: var(--accent); letter-spacing: .2em; text-transform: uppercase; margin-bottom: 1.5rem; position: relative }
+    .contact-heading { font-family: 'EB Garamond', serif; font-size: clamp(2.2rem, 4vw, 3.5rem); font-weight: 400; color: var(--ink); line-height: 1.15; margin-bottom: .8rem; position: relative }
+    .contact-heading em { font-style: italic; color: var(--accent2) }
+    .contact-sub { font-size: .9rem; color: var(--ink2); margin-bottom: 2.5rem; position: relative }
+    .contact-actions { display: flex; justify-content: center; gap: .8rem; flex-wrap: wrap; position: relative }
+    .contact-btn { padding: .7rem 1.8rem; border: 1px solid var(--line); background: var(--white); color: var(--ink2); font-size: .68rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; border-radius: var(--radius); transition: all .3s ease }
+    .contact-btn:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.08) }
+    .contact-btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink) }
+    .contact-btn.primary:hover { background: var(--accent2); border-color: var(--accent2) }
+
+    /* ── FOOTER ── */
+    footer { background: var(--ink); padding: 1.3rem 3.5rem; display: flex; justify-content: space-between; align-items: center }
+    .footer-txt { font-family: 'JetBrains Mono', monospace; font-size: .5rem; color: rgba(255,255,255,.2); letter-spacing: .06em }
+
+    /* ── REVEALS ── */
+    .reveal { opacity: 0; transform: translateY(25px); transition: opacity .7s ease, transform .7s ease }
+    .reveal.visible { opacity: 1; transform: none }
+    .stagger > * { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s ease }
+    .stagger.visible > * { opacity: 1; transform: none }
+    .stagger.visible > *:nth-child(1) { transition-delay: 0s }
+    .stagger.visible > *:nth-child(2) { transition-delay: .06s }
+    .stagger.visible > *:nth-child(3) { transition-delay: .12s }
+    .stagger.visible > *:nth-child(4) { transition-delay: .18s }
+    .stagger.visible > *:nth-child(5) { transition-delay: .24s }
+    .stagger.visible > *:nth-child(6) { transition-delay: .3s }
+    .stagger.visible > *:nth-child(7) { transition-delay: .36s }
+    .stagger.visible > *:nth-child(8) { transition-delay: .42s }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem }
+      nav.scrolled { padding: .8rem 1.5rem }
+      .nav-links { display: none }
+      .hamburger { display: block }
+      .hero { padding: 0 1.5rem }
+      .hero-aside { display: none }
+      .hero-scroll { left: 1.5rem }
+      section { padding: 3.5rem 1.5rem }
+      #contact { padding: 5rem 1.5rem }
+      .exp-row { grid-template-columns: 1fr; gap: .2rem; padding: 1.3rem 0 }
+      .edu-grid { grid-template-columns: 1fr }
+      .lang-row { gap: .6rem }
+      .lang-item { min-width: 100px; padding: 1rem }
+      .contact-actions { flex-direction: column; align-items: center }
+      .contact-btn { width: 100%; max-width: 280px; text-align: center }
+      footer { flex-direction: column; gap: .4rem; text-align: center; padding: 1.2rem 1.5rem }
+    }
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 2.6rem }
+      .lang-row { flex-wrap: wrap }
+      .lang-item { min-width: 45% }
+    }
+
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important }
+      .loader { display: none }
+      .reveal, .stagger > * { opacity: 1; transform: none }
+      .hero h1 .word-inner { transform: none }
+      .sec-rule { transform: scaleX(1) }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <div class="loader-inner">
+    <div class="loader-initials">A.S.</div>
+    <div class="loader-bar"></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a class="nav-name" href="#home">Alexandre Scivoletto</a>
+  <ul class="nav-links">
+    <li><a href="#about" data-nav>About</a></li>
+    <li><a href="#experience" data-nav>Experience</a></li>
+    <li><a href="#education" data-nav>Education</a></li>
+    <li><a href="#research" data-nav>Research</a></li>
+    <li><a href="#contact" data-nav>Contact</a></li>
+    <li><a href="cv.pdf" target="_blank" class="nav-cv">CV ↓</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-overlay" id="mobileMenu">
+  <a href="#about" onclick="closeMenu()">About</a>
+  <a href="#experience" onclick="closeMenu()">Experience</a>
+  <a href="#education" onclick="closeMenu()">Education</a>
+  <a href="#awards" onclick="closeMenu()">Awards</a>
+  <a href="#research" onclick="closeMenu()">Research</a>
+  <a href="#contact" onclick="closeMenu()">Contact</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-label">PhD Candidate in Finance · HEC Liège</div>
+  <h1>
+    <span class="word"><span class="word-inner">Alexandre</span></span><br>
+    <span class="word"><span class="word-inner"><em>Scivoletto</em></span></span>
+  </h1>
+  <p class="hero-sub">Doctoral researcher exploring the intersection of <strong>corporate finance, private equity</strong>, and <strong>artificial intelligence</strong>. Teaching assistant and former President of the HEC Investing Group.</p>
+  <div class="hero-links">
+    <a href="#contact" class="hero-btn primary">Get in touch</a>
+    <a href="https://www.linkedin.com/in/alexandrescivoletto/" target="_blank" class="hero-btn secondary">LinkedIn ↗</a>
+    <a href="cv.pdf" target="_blank" class="hero-btn secondary">Download CV</a>
+  </div>
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+  <div class="hero-aside">
+    <span>HEC Liège</span>
+    <span>Liège, Belgium</span>
+    <span>Since 2019</span>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="sec-header reveal"><span class="sec-num">01</span><h2 class="sec-title">About</h2><div class="sec-rule"></div></div>
+  <div class="about-content reveal">
+    <p><strong>PhD Candidate in Finance</strong> at HEC Liège since 2019, with a particular focus on corporate finance, private equity, and venture capital — applying machine learning and AI to financial research.</p>
+    <p>As long-standing <strong>President of the HEC Investing Group</strong>, I led the organisation for over four years, developing financial valuation and modelling training for students and representing the group in international competitions.</p>
+    <p>I combine rigorous academic research with hands-on experience in <strong>equity analysis, financial modelling, and strategic leadership</strong>.</p>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="sec-header reveal"><span class="sec-num">02</span><h2 class="sec-title">Experience</h2><div class="sec-rule"></div></div>
+  <div class="exp-list stagger">
+
+    <div class="exp-row">
+      <div class="exp-period">Sep 2019 → Present</div>
+      <div>
+        <div class="exp-role">PhD Candidate in Finance</div>
+        <div class="exp-place">HEC Liège</div>
+        <div class="exp-desc">Doctoral research at the intersection of corporate finance, private equity, and venture capital. Applying machine learning and AI methods to financial datasets. Teaching assistant in financial courses.</div>
+        <div class="exp-tags"><span class="tag">Corporate Finance</span><span class="tag">Private Equity</span><span class="tag">Machine Learning</span><span class="tag">Teaching</span></div>
+      </div>
+    </div>
+
+    <div class="exp-row">
+      <div class="exp-period">Mar 2021 → Sep 2025</div>
+      <div>
+        <div class="exp-role">President</div>
+        <div class="exp-place">HEC ULg Investing Group</div>
+        <div class="exp-desc">Led the student investment group for over 4 years. Organised financial valuation and modelling training. Previously served as Business Advisor, Co Vice-President, Sector Leader, and Equity Analyst since 2015.</div>
+        <div class="exp-tags"><span class="tag">Leadership</span><span class="tag">Valuation</span><span class="tag">Financial Modelling</span></div>
+      </div>
+    </div>
+
+    <div class="exp-row">
+      <div class="exp-period">Oct 2018 → Apr 2019</div>
+      <div>
+        <div class="exp-role">CFA Equity Research Challenge</div>
+        <div class="exp-place">CFA Institute</div>
+        <div class="exp-desc">Benelux Winner and EMEA Semi-Finalist in the world's most prestigious equity research competition for university students.</div>
+        <div class="exp-tags"><span class="tag">Equity Research</span><span class="tag">🏆 Benelux Winner</span><span class="tag">EMEA Semi-Finalist</span></div>
+      </div>
+    </div>
+
+    <div class="exp-row">
+      <div class="exp-period">Apr 2018 → Apr 2019</div>
+      <div>
+        <div class="exp-role">President Capitant Liège</div>
+        <div class="exp-place">Capitant vzw</div>
+        <div class="exp-desc">Led the Liège chapter of the Capitant association.</div>
+        <div class="exp-tags"><span class="tag">Leadership</span><span class="tag">Association</span></div>
+      </div>
+    </div>
+
+    <div class="exp-row">
+      <div class="exp-period">2016 — 2017</div>
+      <div>
+        <div class="exp-role">Student Jobs — Banking</div>
+        <div class="exp-place">CBC Banque & Assurance</div>
+        <div class="exp-desc">Private banking department: built client contact database. HR & litigation department: conducted employee branding market research, analysed survey results, and prepared legal documents.</div>
+        <div class="exp-tags"><span class="tag">Private Banking</span><span class="tag">HR Research</span></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="sec-header reveal"><span class="sec-num">03</span><h2 class="sec-title">Education</h2><div class="sec-rule"></div></div>
+  <div class="edu-grid stagger">
+
+    <div class="edu-card">
+      <div class="edu-year-bg">2023</div>
+      <div class="edu-school">University of Cambridge</div>
+      <div class="edu-degree">Visiting PhD Candidate</div>
+      <div class="edu-date">June 2023 — July 2023</div>
+    </div>
+
+    <div class="edu-card">
+      <div class="edu-year-bg">2022</div>
+      <div class="edu-school">Vilnius University</div>
+      <div class="edu-degree">Doctoral Course — Machine Learning</div>
+      <div class="edu-date">July 2022</div>
+    </div>
+
+    <div class="edu-card">
+      <div class="edu-year-bg">2022</div>
+      <div class="edu-school">Barcelona School of Economics</div>
+      <div class="edu-degree">Doctoral Course — Empirical Corporate Finance</div>
+      <div class="edu-date">June — July 2022</div>
+    </div>
+
+    <div class="edu-card">
+      <div class="edu-year-bg">2020</div>
+      <div class="edu-school">Erasmus University Rotterdam</div>
+      <div class="edu-degree">Doctoral Course — Panel Data Econometrics</div>
+      <div class="edu-date">September 2020</div>
+    </div>
+
+    <div class="edu-card">
+      <div class="edu-year-bg">2020</div>
+      <div class="edu-school">Universität Hohenheim</div>
+      <div class="edu-degree">Doctoral Course — Identification Strategies in Finance</div>
+      <div class="edu-date">February 2020</div>
+    </div>
+
+    <div class="edu-card">
+      <div class="edu-year-bg">2019</div>
+      <div class="edu-school">HEC Liège</div>
+      <div class="edu-degree">PhD Candidate in Finance</div>
+      <div class="edu-date">September 2019 — Present</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- AWARDS -->
+<section id="awards">
+  <div class="sec-header reveal"><span class="sec-num">04</span><h2 class="sec-title">Honours & Awards</h2><div class="sec-rule"></div></div>
+  <div class="awards-list stagger">
+    <div class="award-item">
+      <div class="award-icon">🏆</div>
+      <div>
+        <div class="award-title">CFA Research Challenge — Benelux Winner</div>
+        <div class="award-desc">Won the Benelux regional final of the CFA Institute Research Challenge, the most prestigious equity research competition for university students worldwide.</div>
+      </div>
+    </div>
+    <div class="award-item">
+      <div class="award-icon">🌍</div>
+      <div>
+        <div class="award-title">CFA Research Challenge — EMEA Semi-Finalist</div>
+        <div class="award-desc">Advanced to the EMEA semi-finals, competing against top finance students from across Europe, the Middle East, and Africa.</div>
+      </div>
+    </div>
+    <div class="award-item">
+      <div class="award-icon">🎓</div>
+      <div>
+        <div class="award-title">Visiting Researcher — University of Cambridge</div>
+        <div class="award-desc">Selected as visiting PhD candidate at the University of Cambridge, one of the world's leading academic institutions.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESEARCH -->
+<section id="research">
+  <div class="sec-header reveal"><span class="sec-num">05</span><h2 class="sec-title">Research Interests</h2><div class="sec-rule"></div></div>
+  <div class="research-cards stagger">
+    <div class="research-card">
+      <div class="research-tag">Primary Focus</div>
+      <div class="research-title">Corporate Finance, Private Equity & Venture Capital</div>
+      <div class="research-meta">Investigating deal structures, fund performance, and value creation mechanisms in PE/VC markets.</div>
+    </div>
+    <div class="research-card">
+      <div class="research-tag">Methodology</div>
+      <div class="research-title">Machine Learning & AI in Finance</div>
+      <div class="research-meta">Applying ML techniques to financial datasets — predictive modelling, NLP on financial texts, and alternative data analysis.</div>
+    </div>
+    <div class="research-card">
+      <div class="research-tag">Econometrics</div>
+      <div class="research-title">Panel Data & Identification Strategies</div>
+      <div class="research-meta">Advanced econometric methods for causal inference in corporate finance research.</div>
+    </div>
+  </div>
+</section>
+
+<!-- LANGUAGES -->
+<section id="languages">
+  <div class="sec-header reveal"><span class="sec-num">06</span><h2 class="sec-title">Languages</h2><div class="sec-rule"></div></div>
+  <div class="lang-row stagger">
+    <div class="lang-item"><div class="lang-flag">🇫🇷</div><div class="lang-name">French</div><div class="lang-level">Native</div></div>
+    <div class="lang-item"><div class="lang-flag">🇬🇧</div><div class="lang-name">English</div><div class="lang-level">Full Professional</div></div>
+    <div class="lang-item"><div class="lang-flag">🇳🇱</div><div class="lang-name">Dutch</div><div class="lang-level">Professional Working</div></div>
+    <div class="lang-item"><div class="lang-flag">🇩🇪</div><div class="lang-name">German</div><div class="lang-level">Limited Working</div></div>
+    <div class="lang-item"><div class="lang-flag">🇮🇹</div><div class="lang-name">Italian</div><div class="lang-level">Limited Working</div></div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-watermark">CONTACT</div>
+  <p class="contact-label reveal">Let's connect</p>
+  <h2 class="contact-heading reveal">Open to <em>research collaborations</em><br>& opportunities</h2>
+  <p class="contact-sub reveal">Corporate Finance · Private Equity · AI · Econometrics</p>
+  <div class="contact-actions reveal">
+    <a href="mailto:alexandre.scivoletto@gmail.com" class="contact-btn primary">✉ Email me</a>
+    <a href="https://www.linkedin.com/in/alexandrescivoletto/" target="_blank" class="contact-btn">LinkedIn ↗</a>
+    <a href="cv.pdf" target="_blank" class="contact-btn">Download CV ↓</a>
+  </div>
+</section>
+
+<footer>
+  <span class="footer-txt">© 2026 Alexandre Scivoletto</span>
+  <span class="footer-txt">PhD Finance · HEC Liège</span>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  // Loader
+  var loader = document.getElementById('loader');
+  window.addEventListener('load', function(){
+    setTimeout(function(){ loader.classList.add('done') }, 1200);
+  });
+
+  // Nav scroll
+  function onScroll(){
+    var sy = window.scrollY;
+    document.getElementById('navbar').classList.toggle('scrolled', sy > 50);
+
+    var links = document.querySelectorAll('.nav-links a[data-nav]');
+    var current = '';
+    document.querySelectorAll('section[id]').forEach(function(s){
+      if(sy >= s.offsetTop - 140) current = s.id;
+    });
+    links.forEach(function(l){
+      l.classList.toggle('active', l.getAttribute('href') === '#' + current);
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // Reveals
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.06 });
+  document.querySelectorAll('.reveal,.stagger,.sec-header').forEach(function(el){ obs.observe(el) });
+
+  // Hamburger
+  var ham = document.getElementById('hamburger');
+  var mm = document.getElementById('mobileMenu');
+  ham.addEventListener('click', function(){
+    ham.classList.toggle('open');
+    mm.classList.toggle('open');
+    document.body.style.overflow = mm.classList.contains('open') ? 'hidden' : '';
+  });
+  window.closeMenu = function(){
+    ham.classList.remove('open');
+    mm.classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  // Smooth anchor scroll
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener('click', function(e){
+      e.preventDefault();
+      var target = document.querySelector(this.getAttribute('href'));
+      if(target){
+        window.scrollTo({ top: target.offsetTop - 70, behavior: 'smooth' });
+      }
+    });
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closeMenu();
+  });
+})();
+</script>
+</body>
+</html>
